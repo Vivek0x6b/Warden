@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+ 
+# Environment / secrets
+.env
+.env.local
+ 
+# Node / React (frontend, added later)
+node_modules/
+dist/
+build/
+ 
+# Editor
+.vscode/
+.idea/
+ 
+# OS
+.DS_Store
+Thumbs.db
+ 
+# Data (synthetic data generated locally, not committed unless you want a sample checked in)
+/data/generated/

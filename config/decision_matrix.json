@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "name": "Player Protection Decision Matrix",
+    "description": "This is the same rules as PLAYBOOK.md, written so a scoring engine can read them directly instead of a person reading the document each time.",
+    "version": "1.0"
+  },
+
+  "severity_tiers": ["minor", "moderate", "severe"],
+
+  "evidence_requirements": {
+    "minor": {
+      "min_reports": 3,
+      "or_anomaly_confidence_below": 0.70,
+      "description": "3 or more separate player reports, or an automatic unusual activity flag below 70% confidence"
+    },
+    "moderate": {
+      "min_anomaly_confidence": 0.70,
+      "or_min_reports": 5,
+      "or_reviewed_evidence": true,
+      "description": "An automatic unusual activity flag at 70% confidence or more, or a checked clip or log, or 5 or more reports that support each other"
+    },
+    "severe": {
+      "min_anomaly_confidence": 0.90,
+      "requires_corroboration": true,
+      "description": "An automatic unusual activity flag at 90% confidence or more, plus extra proof such as logs, clips, or several separate reports"
+    },
+    "below_minimum": {
+      "action": "log_only",
+      "description": "Flags that do not meet the level's proof requirement are saved for tracking trends but do not trigger a punishment. They go to a person for review instead."
+    }
+  },
+
+  "escalation_ladder": {
+    "minor": {
+      "offense_1": "warning plus in game notice",
+      "offense_2": "24 hour restriction",
+      "offense_3_plus": "7 day ban"
+    },
+    "moderate": {
+      "offense_1": "7 day ban",
+      "offense_2": "30 day ban",
+      "offense_3_plus": "permanent ban"
+    },
+    "severe": {
+      "offense_1": "30 day ban (or permanent, depending on the case)",
+      "offense_2": "permanent ban",
+      "offense_3_plus": "permanent ban plus account flagged for evasion monitoring"
+    }
+  },
+
+  "categories": {
+    "cheating": {
+      "label": "Cheating / Hacking",
+      "definition": "Using outside software or scripts to gain an unfair advantage",
+      "triggers": {
+        "minor": "A cosmetic or utility tool with no gameplay effect, for example a harmless FPS unlocker or overlay",
+        "moderate": "Confirmed macro or script use, single session",
+        "severe": "Confirmed script use across multiple sessions, or unusually high win rates that match automated play"
+      }
+    },
+    "exploitation": {
+      "label": "Exploitation",
+      "definition": "Using game bugs or features that were not meant to work this way, for an advantage",
+      "triggers": {
+        "minor": "Minor visual or cosmetic glitch abuse with no real impact on competition",
+        "moderate": "Confirmed use of a game exploit for a real competitive or progress advantage",
+        "severe": "The same exploit used again and again across many matches"
+      }
+    },
+    "matchmaking_abuse": {
+      "label": "Matchmaking Abuse",
+      "definition": "Tricking the matchmaking or ranking system",
+      "triggers": {
+        "minor": "An unclear sign of a possible smurf account, a new account doing much better than expected for its age",
+        "moderate": "Confirmed proof of paid boosting or rank manipulation done on purpose",
+        "severe": "A group of people working together to boost accounts or manipulate ranks"
+      }
+    },
+    "toxicity": {
+      "label": "Toxicity & Abusive Behavior",
+      "definition": "Harassment, hate speech, threats, or targeted abuse through chat, voice, or gestures",
+      "triggers": {
+        "minor": "One incident that is not targeted at a specific person, for example one heated insult in a match",
+        "moderate": "Repeated or targeted insults or slurs within one match or over a short time",
+        "severe": "Threats of violence, sharing someone's private info, or a group of people harassing someone together"
+      }
+    },
+    "ban_evasion": {
+      "label": "Ban Evasion & Account Abuse",
+      "definition": "Making a new account to get around an active ban, or sharing and selling accounts tied to boosting or getting around a ban",
+      "triggers": {
+        "minor": null,
+        "moderate": null,
+        "severe": "Any confirmed alternate account bypassing an active ban. Evasion is always severe, no lower level applies."
+      },
+      "special_rule": "When evasion is confirmed, the punishment steps restart at the ORIGINAL account's offense count, not the new account's. Evasion itself is also logged as its own separate severe offense."
+    }
+  },
+
+  "appeals": {
+    "window_days": 14,
+    "reviewer_independence_required": true,
+    "steps": [
+      "submission: player sends an appeal with more information within 14 days",
+      "review: a different reviewer looks again at the original proof against this matrix, without seeing what punishment was already given",
+      "outcome: punishment stays the same, is reduced, or is reversed, with the reason written down against the specific rules that were or were not met"
+    ],
+    "note": "Repeated overturns on the same kind of detection are a sign of a detection or process problem, not just one mistake. Track this as a pattern, not case by case."
+  }
+}
