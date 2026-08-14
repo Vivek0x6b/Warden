@@ -1,0 +1,27 @@
+{
+  "note": "Ground truth for testing the scoring engine later. Do not let the detection code read this file, that would defeat the point.",
+  "scripted_cheaters": [
+    "P9001",
+    "P9002",
+    "P9003"
+  ],
+  "smurf_accounts": [
+    "P8001",
+    "P8002",
+    "P8003"
+  ],
+  "ban_evasion_pairs": [
+    {
+      "banned_account": "PBANNED001",
+      "alt_account": "PALT001"
+    },
+    {
+      "banned_account": "PBANNED002",
+      "alt_account": "PALT002"
+    },
+    {
+      "banned_account": "PBANNED003",
+      "alt_account": "PALT003"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+report_id,reporter_id,reported_id,category,note
+R0001,P0049,P9001,cheating,reaction time was inhuman all match
+R0002,P0017,P9001,cheating,"every parry looked frame perfect, felt scripted"
+R0003,P0003,P9001,cheating,"every parry looked frame perfect, felt scripted"
+R0004,P0067,P9001,cheating,clearly using some kind of auto block tool
+R0005,P0020,P9002,cheating,clearly using some kind of auto block tool
+R0006,P0013,P9002,cheating,"every parry looked frame perfect, felt scripted"
+R0007,P0061,P9002,cheating,clearly using some kind of auto block tool
+R0008,P0077,P9002,cheating,"every parry looked frame perfect, felt scripted"
+R0009,P0069,P9002,cheating,clearly using some kind of auto block tool
+R0010,P0016,P9002,cheating,"every parry looked frame perfect, felt scripted"
+R0011,P0017,P9003,cheating,clearly using some kind of auto block tool
+R0012,P0070,P9003,cheating,"every parry looked frame perfect, felt scripted"
+R0013,P0056,P9003,cheating,clearly using some kind of auto block tool
+R0014,P0054,P9003,cheating,reaction time was inhuman all match
+R0015,P0006,P9003,cheating,clearly using some kind of auto block tool
+R0016,P0068,P9003,cheating,reaction time was inhuman all match
+R0017,P0062,P8001,matchmaking_abuse,this player is way too good for how new the account is
+R0018,P0045,P8001,matchmaking_abuse,"brand new account destroying a low rank lobby, feels like a smurf"
+R0019,P0055,P8001,matchmaking_abuse,"brand new account destroying a low rank lobby, feels like a smurf"
+R0020,P0062,P8002,matchmaking_abuse,"brand new account destroying a low rank lobby, feels like a smurf"
+R0021,P0011,P8002,matchmaking_abuse,this player is way too good for how new the account is
+R0022,P0077,P8002,matchmaking_abuse,this player is way too good for how new the account is
+R0023,P0033,P8002,matchmaking_abuse,"brand new account destroying a low rank lobby, feels like a smurf"
+R0024,P0001,P8003,matchmaking_abuse,"brand new account destroying a low rank lobby, feels like a smurf"
+R0025,P0067,P8003,matchmaking_abuse,"brand new account destroying a low rank lobby, feels like a smurf"
+R0026,P0049,P0027,toxicity,threatened to find me after the match
+R0027,P0053,P0047,toxicity,called me slurs after losing the duel
+R0028,P0020,P0055,toxicity,threatened to find me after the match
+R0029,P0034,P0069,toxicity,was targeting and harassing one player the whole game
+R0030,P0073,P0047,toxicity,threatened to find me after the match
+R0031,P0051,P0027,toxicity,was targeting and harassing one player the whole game
+R0032,P0071,P0072,toxicity,was targeting and harassing one player the whole game
+R0033,P0023,P0048,toxicity,was targeting and harassing one player the whole game
+R0034,P0033,P0040,toxicity,threatened to find me after the match
+R0035,P0051,P0018,toxicity,called me slurs after losing the duel
+R0036,P0030,P0058,toxicity,kept spamming insults in match chat
+R0037,P0013,P0028,toxicity,was targeting and harassing one player the whole game
+R0038,P0044,P0071,toxicity,called me slurs after losing the duel
+R0039,P0021,P0050,toxicity,called me slurs after losing the duel
+R0040,P0012,P0019,toxicity,was targeting and harassing one player the whole game
+R0041,P0077,P0056,cheating,salty single report after a close loss
+R0042,P0009,P0034,cheating,salty single report after a close loss
+R0043,P0048,P0011,cheating,salty single report after a close loss
+R0044,P0050,P0052,toxicity,salty single report after a close loss
+R0045,P0077,P0008,cheating,salty single report after a close loss
+R0046,P0064,P0057,cheating,salty single report after a close loss
+R0047,P0026,P0067,toxicity,salty single report after a close loss
+R0048,P0025,P0005,cheating,salty single report after a close loss
+R0049,P0079,P0022,cheating,salty single report after a close loss
+R0050,P0047,P0031,cheating,salty single report after a close loss
