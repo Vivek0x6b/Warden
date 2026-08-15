@@ -2,14 +2,16 @@
  This is Warden scoring engine it reads 'decision_matrix.json', 'match_stats.csv', 'player_reports.csv', 'account_links.csv'
  afterwards writes 'flagged_cases.json' and checks it's own result against 'answer_key.json' that how actually engine is performing
 """
-
+import os 
 import csv
 import json
 import statistics
 from collections import defaultdict
 
-CONFIG_PATH = "config/decision_matrix.json"
-DATA_FOLDER = "data"
+#it helps to find scoring_engine no matter which folder your terminal is in
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_PATH = os.path.join(BASE_DIR, "config", "decision_matrix.json")
+DATA_FOLDER = os.path.join(BASE_DIR,"data")
 
 
 def load_json(path):
@@ -133,7 +135,8 @@ def build_case(player_id, category, tier, matrix, reason):
     }
 
 
-def main():
+def run_pipeline():
+    """Runs the full scoring pipeline and returns the list of flagged cases."""
     matrix = load_json(CONFIG_PATH)
     match_rows = load_csv(f"{DATA_FOLDER}/match_stats.csv")
     report_rows = load_csv(f"{DATA_FOLDER}/player_reports.csv")
@@ -145,7 +148,6 @@ def main():
 
     cases = []
 
-    # cheating: stat anomaly, backed up by any matching reports
     for player_id, sig in stat_signals.items():
         reports = report_counts.get((player_id, "cheating"), 0)
         tier = evaluate_tier(sig["cheating_confidence"], reports, evidence_rules)
@@ -154,7 +156,6 @@ def main():
                        f"anomaly confidence {sig['cheating_confidence']}, {reports} matching reports")
             cases.append(build_case(player_id, "cheating", tier, matrix, reason))
 
-    # matchmaking abuse: new account, high win rate
     for player_id, sig in stat_signals.items():
         reports = report_counts.get((player_id, "matchmaking_abuse"), 0)
         tier = evaluate_tier(sig["smurf_confidence"], reports, evidence_rules)
@@ -163,7 +164,6 @@ def main():
                        f"anomaly confidence {sig['smurf_confidence']}, {reports} matching reports")
             cases.append(build_case(player_id, "matchmaking_abuse", tier, matrix, reason))
 
-    # toxicity: reports only, there is no automated signal for this one
     toxicity_reported_players = {pid for (pid, cat) in report_counts if cat == "toxicity"}
     for player_id in toxicity_reported_players:
         reports = report_counts.get((player_id, "toxicity"), 0)
@@ -172,17 +172,19 @@ def main():
             reason = f"{reports} toxicity reports"
             cases.append(build_case(player_id, "toxicity", tier, matrix, reason))
 
-    # ban evasion: always severe, confirmed by a shared device or payment match
     for player_id in detect_ban_evasion(account_rows):
         reason = "shares a device or payment fingerprint with a banned account"
         cases.append(build_case(player_id, "ban_evasion", "severe", matrix, reason))
 
+    return cases
+
+#Here fastapi can resue the logic
+def main():
+    cases = run_pipeline()
     with open(f"{DATA_FOLDER}/flagged_cases.json", "w", encoding="utf-8") as f:
         json.dump(cases, f, indent=2)
     print(f"wrote {len(cases)} flagged cases to {DATA_FOLDER}/flagged_cases.json")
-
     validate(cases)
-
 
 def validate(cases):
     #Checks the flagged cases against the answer key
