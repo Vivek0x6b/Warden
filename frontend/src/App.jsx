@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button } from "@/components/ui/button"
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -21,6 +22,7 @@ function App() {
             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
           </p>
         </div>
+        <Button>Click me</Button>
         <button
           type="button"
           className="counter"
