@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
@@ -84,10 +85,10 @@
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
+    --background: #0d0d0d;
+    --foreground: #ffffff;
+    --card: #1a1a19;
+    --card-foreground: #ffffff;
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
     --primary: oklch(0.922 0 0);
@@ -115,6 +116,41 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+    /* Warden severity + category colors */
+    --status-critical: #e66767;
+    --status-serious: #ec835a;
+    --status-warning: #fab219;
+    --status-good: #0ca30c;
+    --cat-cheating: #3987e5;
+    --cat-matchmaking: #d95926;
+    --cat-toxicity: #199e70;
+    --cat-evasion: #9085e9;
+    --meter-track-critical: rgba(230,103,103,0.18);
+    --meter-track-serious: rgba(236,131,90,0.18);
+    --meter-track-warning: rgba(250,178,25,0.18);
+    --gridline: #2c2c2a;
+    --border-strong: rgba(255,255,255,0.16);
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+}
+
+.playbook-prose {
+  --tw-prose-body: var(--text-secondary);
+  --tw-prose-headings: var(--text-primary);
+  --tw-prose-lead: var(--text-secondary);
+  --tw-prose-links: var(--cat-cheating);
+  --tw-prose-bold: var(--text-primary);
+  --tw-prose-counters: var(--text-muted);
+  --tw-prose-bullets: var(--text-muted);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--text-secondary);
+  --tw-prose-quote-borders: var(--border-strong);
+  --tw-prose-captions: var(--text-muted);
+  --tw-prose-code: var(--text-primary);
+  --tw-prose-pre-code: var(--text-secondary);
+  --tw-prose-pre-bg: var(--card);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--gridline);
 }
 
 @layer base {
