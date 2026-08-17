@@ -7,6 +7,7 @@ import csv
 import json
 import statistics
 from collections import defaultdict
+from offense_store import get_offense_count, init_db
 
 #it helps to find scoring_engine no matter which folder your terminal is in
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -123,7 +124,17 @@ def detect_ban_evasion(account_rows):
 
 
 def build_case(player_id, category, tier, matrix, reason):
-    action = matrix["escalation_ladder"][tier]["offense_1"]  # treated as a 1st offense for now
+    prior_offenses = get_offense_count(player_id)
+    offense_number = prior_offenses + 1
+
+    if offense_number == 1:
+        offense_key = "offense_1"
+    elif offense_number == 2:
+        offense_key = "offense_2"
+    else:
+        offense_key = "offense_3_plus"
+
+    action = matrix["escalation_ladder"][tier][offense_key]
     trigger_text = matrix["categories"][category]["triggers"].get(tier, "")
     return {
         "player_id": player_id,
@@ -132,11 +143,13 @@ def build_case(player_id, category, tier, matrix, reason):
         "reason": reason,
         "matches_playbook_trigger": trigger_text,
         "recommended_action": action,
+        "offense_number": offense_number,
     }
 
 
 def run_pipeline():
     """Runs the full scoring pipeline and returns the list of flagged cases."""
+    init_db()
     matrix = load_json(CONFIG_PATH)
     match_rows = load_csv(f"{DATA_FOLDER}/match_stats.csv")
     report_rows = load_csv(f"{DATA_FOLDER}/player_reports.csv")
