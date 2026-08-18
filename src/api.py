@@ -37,10 +37,15 @@ def get_cases():
     cases = run_pipeline()
     return {"count": len(cases), "cases": cases}
 
+_writeup_cache = {}
+
+
 @app.get("/cases/writeups")
 def get_cases_with_writeups():
-    """Runs the scoring engine and adds an AI write up to every case."""
+    """Runs the scoring engine and adds an AI write up to every case, caching each write-up so repeat requests don't re-call the AI for the same case and avoid token burning."""
     cases = run_pipeline()
     for case in cases:
-        case["ai_writeup"] = generate_writeup(case)
+        if case["player_id"] not in _writeup_cache:
+            _writeup_cache[case["player_id"]] = generate_writeup(case)
+        case["ai_writeup"] = _writeup_cache[case["player_id"]]
     return {"count": len(cases), "cases": cases}

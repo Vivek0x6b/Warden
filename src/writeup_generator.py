@@ -6,9 +6,10 @@ It requires GROQ_API_KEY
 
 """
 import os
+import time
 from pathlib import Path
 from dotenv import load_dotenv
-from groq import Groq
+from groq import Groq, RateLimitError
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -39,17 +40,23 @@ def generate_writeup(case):
         f"Matches playbook rule: {case['matches_playbook_trigger']}\n"
         f"Recommended action: {case['recommended_action']}"
     )
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": case_text},
-        ],
-        temperature=0.3,
-        max_tokens=500,
-        reasoning_effort="low",
-    )
-    return response.choices[0].message.content.strip()
+    for attempt in range(3):
+        try:
+            response = client.chat.completions.create(
+                model=MODEL,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": case_text},
+                ],
+                temperature=0.3,
+                max_tokens=350,
+                reasoning_effort="low",
+            )
+            return response.choices[0].message.content.strip()
+        except RateLimitError:
+            if attempt == 2:
+                raise
+            time.sleep(4)
 
 
 if __name__ == "__main__":
