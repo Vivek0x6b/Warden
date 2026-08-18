@@ -8,7 +8,7 @@ import DetailPanel from "./components/DetailPanel"
 import Header from "./components/Header"
 import StatTiles from "./components/StatTiles"
 
-const API_URL = "http://localhost:8000/cases/writeups"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/cases/writeups"
 
 function App() {
   const [cases, setCases] = useState([])
