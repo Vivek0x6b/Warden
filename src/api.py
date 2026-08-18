@@ -14,6 +14,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from offense_store import init_db, get_offense_count, record_offense
+
+
+@app.on_event("startup")
+def seed_on_startup():
+    init_db()
+    if get_offense_count("P9001") == 0:
+        record_offense("P9001", "cheating", "severe", "30 day ban (or permanent, depending on the case)")
+    if get_offense_count("P8001") == 0:
+        record_offense("P8001", "matchmaking_abuse", "moderate", "7 day ban")
+        record_offense("P8001", "matchmaking_abuse", "moderate", "7 day ban")
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
