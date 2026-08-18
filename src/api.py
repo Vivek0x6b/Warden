@@ -9,11 +9,14 @@ app = FastAPI(title="Warden", description="Player protection triage API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://wardenpp.vercel.app",
+        "https://warden-mauve-eight.vercel.app",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 from offense_store import init_db, get_offense_count, record_offense
 
 
