@@ -34,7 +34,7 @@ export default function StatTiles({ cases }) {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-px bg-[var(--border)] border-b border-[var(--border)]">
+    <div className="grid grid-cols-[1fr_1fr_1.6fr_1fr] gap-px bg-[var(--border)] border-b border-[var(--border)]">
       <div className="bg-[var(--background)] px-[24px] py-[18px]">
         <p className="text-xs text-[var(--text-muted)] mb-2">Flagged cases</p>
         <p className="text-3xl font-semibold leading-none mb-2.5">{total}</p>

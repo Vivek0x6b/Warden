@@ -123,7 +123,7 @@ def detect_ban_evasion(account_rows):
     return evaders
 
 
-def build_case(player_id, category, tier, matrix, reason):
+def build_case(player_id, category, tier, matrix, reason, confidence=None, reports=0, extra=None):
     prior_offenses = get_offense_count(player_id)
     offense_number = prior_offenses + 1
 
@@ -136,7 +136,8 @@ def build_case(player_id, category, tier, matrix, reason):
 
     action = matrix["escalation_ladder"][tier][offense_key]
     trigger_text = matrix["categories"][category]["triggers"].get(tier, "")
-    return {
+
+    case = {
         "player_id": player_id,
         "category": category,
         "severity": tier,
@@ -144,7 +145,12 @@ def build_case(player_id, category, tier, matrix, reason):
         "matches_playbook_trigger": trigger_text,
         "recommended_action": action,
         "offense_number": offense_number,
+        "confidence": confidence,
+        "reports": reports,
     }
+    if extra:
+        case.update(extra)
+    return case
 
 
 def run_pipeline():
@@ -167,7 +173,12 @@ def run_pipeline():
         if tier:
             reason = (f"reaction time barely varies (std dev {sig['reaction_time_std_dev']}ms), "
                        f"anomaly confidence {sig['cheating_confidence']}, {reports} matching reports")
-            cases.append(build_case(player_id, "cheating", tier, matrix, reason))
+            cases.append(build_case(
+                player_id, "cheating", tier, matrix, reason,
+                confidence=sig["cheating_confidence"],
+                reports=reports,
+                extra={"reaction_std_ms": sig["reaction_time_std_dev"]},
+            ))
 
     for player_id, sig in stat_signals.items():
         reports = report_counts.get((player_id, "matchmaking_abuse"), 0)
@@ -175,7 +186,12 @@ def run_pipeline():
         if tier:
             reason = (f"account age {sig['account_age_days']} days, win rate {sig['win_rate']}, "
                        f"anomaly confidence {sig['smurf_confidence']}, {reports} matching reports")
-            cases.append(build_case(player_id, "matchmaking_abuse", tier, matrix, reason))
+            cases.append(build_case(
+                player_id, "matchmaking_abuse", tier, matrix, reason,
+                confidence=sig["smurf_confidence"],
+                reports=reports,
+                extra={"account_age_days": sig["account_age_days"], "win_rate": sig["win_rate"]},
+            ))
 
     toxicity_reported_players = {pid for (pid, cat) in report_counts if cat == "toxicity"}
     for player_id in toxicity_reported_players:
@@ -183,11 +199,11 @@ def run_pipeline():
         tier = evaluate_tier(None, reports, evidence_rules)
         if tier:
             reason = f"{reports} toxicity reports"
-            cases.append(build_case(player_id, "toxicity", tier, matrix, reason))
+            cases.append(build_case(player_id, "toxicity", tier, matrix, reason, reports=reports))
 
     for player_id in detect_ban_evasion(account_rows):
         reason = "shares a device or payment fingerprint with a banned account"
-        cases.append(build_case(player_id, "ban_evasion", "severe", matrix, reason))
+        cases.append(build_case(player_id, "ban_evasion", "severe", matrix, reason, confidence=1.0, reports=0))
 
     return cases
 

@@ -1,4 +1,4 @@
-export default function Header({ showPlaybook, onTogglePlaybook }) {
+export default function Header({ showPlaybook, onTogglePlaybook, caseCount }) {
   return (
     <header className="flex items-center justify-between px-7 py-5 border-b border-[var(--border)]">
       <div className="flex items-center gap-3">
@@ -26,7 +26,7 @@ export default function Header({ showPlaybook, onTogglePlaybook }) {
           {showPlaybook ? "Hide playbook" : "Playbook"}
         </button>
         <div className="text-[11.5px] text-[var(--text-muted)] border border-[var(--border)] rounded-full px-2.5 py-1">
-          demo data · 10 flagged cases
+          live data · {caseCount} flagged cases
         </div>
       </div>
     </header>

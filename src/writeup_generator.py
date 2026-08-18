@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-MODEL = "llama-3.1-8b-instant"
+MODEL = "openai/gpt-oss-20b"
 
 SYSTEM_PROMPT = """ You are writing incident summaries for a player protection moderation team.
 You will be given structured case data about a player flagged by an automated system: the offense category, 
@@ -46,7 +46,8 @@ def generate_writeup(case):
             {"role": "user", "content": case_text},
         ],
         temperature=0.3,
-        max_tokens=200,
+        max_tokens=500,
+        reasoning_effort="low",
     )
     return response.choices[0].message.content.strip()
 

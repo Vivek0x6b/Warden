@@ -25,3 +25,8 @@ Thumbs.db
  
 # Data (synthetic data generated locally, not committed unless you want a sample checked in)
 /data/generated/
+
+# SQLite database is generated data, not source
+data/offense_history.db
+
+data/flagged_cases.json

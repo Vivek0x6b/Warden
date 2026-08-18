@@ -3,9 +3,16 @@
 from fastapi import FastAPI
 from scoring_engine import run_pipeline
 from writeup_generator import generate_writeup
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Warden", description="Player protection triage API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/health")
 def health():
