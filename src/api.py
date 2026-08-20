@@ -1,6 +1,7 @@
 #Warden Api
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from scoring_engine import run_pipeline
 from writeup_generator import generate_writeup
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,7 +18,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-from offense_store import init_db, get_offense_count, record_offense
+from offense_store import (
+    init_db,
+    get_offense_count,
+    record_offense,
+    record_case_decision,
+    get_case_decision,
+)
 
 
 @app.on_event("startup")
@@ -38,6 +45,8 @@ def health():
 def get_cases():
     """Runs the scoring engine fresh and returns every flagged case."""
     cases = run_pipeline()
+    for case in cases:
+        case["status"] = get_case_decision(case["player_id"], case["category"])
     return {"count": len(cases), "cases": cases}
 
 _writeup_cache = {}
@@ -51,4 +60,35 @@ def get_cases_with_writeups():
         if case["player_id"] not in _writeup_cache:
             _writeup_cache[case["player_id"]] = generate_writeup(case)
         case["ai_writeup"] = _writeup_cache[case["player_id"]]
+        case["status"] = get_case_decision(case["player_id"], case["category"])
     return {"count": len(cases), "cases": cases}
+
+
+class DecisionRequest(BaseModel):
+    category: str
+    decision: str  # "approve" or "override"
+
+
+@app.post("/cases/{player_id}/decision")
+def decide_case(player_id: str, body: DecisionRequest):
+    """Records a moderator's call on a flagged case. 'approve' confirms the recommended
+    action and logs it as a real offense, feeding into future repeat-offender escalation.
+    'override' dismisses the case as a false positive and does not escalate."""
+    if body.decision not in ("approve", "override"):
+        raise HTTPException(status_code=400, detail="decision must be 'approve' or 'override'")
+
+    cases = run_pipeline()
+    case = next(
+        (c for c in cases if c["player_id"] == player_id and c["category"] == body.category),
+        None,
+    )
+    if case is None:
+        raise HTTPException(status_code=404, detail="No matching flagged case for that player/category")
+
+    if body.decision == "approve":
+        record_offense(player_id, body.category, case["severity"], case["recommended_action"])
+
+    status = "approved" if body.decision == "approve" else "overridden"
+    record_case_decision(player_id, body.category, status)
+
+    return {"player_id": player_id, "category": body.category, "status": status}

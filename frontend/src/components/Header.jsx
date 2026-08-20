@@ -1,12 +1,14 @@
+import { Eye } from "lucide-react"
+
 export default function Header({ showPlaybook, onTogglePlaybook, caseCount }) {
   return (
     <header className="flex items-center justify-between px-7 py-5 border-b border-[var(--border)]">
       <div className="flex items-center gap-3">
         <div
-          className="w-[34px] h-[34px] rounded-lg flex items-center justify-center font-bold text-base text-white shrink-0"
-          style={{ background: "linear-gradient(160deg, var(--cat-cheating), var(--cat-evasion))" }}
+          className="w-[34px] h-[34px] rounded-lg flex items-center justify-center text-white shrink-0"
+          style={{ background: "linear-gradient(160deg, var(--cat-toxicity), var(--cat-cheating))" }}
         >
-          W
+          <Eye className="w-[18px] h-[18px]" strokeWidth={2} />
         </div>
         <div>
           <h1 className="m-0 text-[17px] font-semibold tracking-wide">Warden</h1>

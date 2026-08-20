@@ -7,8 +7,7 @@ import CaseQueue from "./components/CaseQueue"
 import DetailPanel from "./components/DetailPanel"
 import Header from "./components/Header"
 import StatTiles from "./components/StatTiles"
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/cases/writeups"
+import { API_URL, postDecision } from "./lib/api"
 
 function App() {
   const [cases, setCases] = useState([])
@@ -35,6 +34,15 @@ function App() {
   }, [])
 
   const selectedCase = cases.find((c) => c.player_id === selectedId)
+
+  const handleDecision = async (playerId, category, decision) => {
+    const result = await postDecision(playerId, category, decision)
+    setCases((prev) =>
+      prev.map((c) =>
+        c.player_id === playerId && c.category === category ? { ...c, status: result.status } : c
+      )
+    )
+  }
 
   if (loading) {
     return (
@@ -74,7 +82,7 @@ function App() {
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.15 }}
               >
-                <DetailPanel activeCase={selectedCase} />
+                <DetailPanel activeCase={selectedCase} onDecide={handleDecision} />
               </motion.div>
             </AnimatePresence>
             <EvidencePanel activeCase={selectedCase} />

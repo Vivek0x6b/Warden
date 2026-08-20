@@ -1,10 +1,33 @@
+import { useState, useEffect } from "react"
 import { sevColor, sevTrack, sevIcon, catColor, catIcon, catLabel } from "../lib/severity"
 
-export default function DetailPanel({ activeCase }) {
+export default function DetailPanel({ activeCase, onDecide }) {
+  const [saving, setSaving] = useState(null) // "approve" | "override" | null
+  const [decideError, setDecideError] = useState(null)
+
+  // Reset transient UI state whenever the selected case changes.
+  useEffect(() => {
+    setSaving(null)
+    setDecideError(null)
+  }, [activeCase?.player_id, activeCase?.category])
+
   if (!activeCase) return null
   const c = activeCase
   const SevIcon = sevIcon[c.severity]
   const CatIcon = catIcon[c.category]
+  const status = c.status || "pending"
+
+  const handleClick = async (decision) => {
+    setSaving(decision)
+    setDecideError(null)
+    try {
+      await onDecide(c.player_id, c.category, decision)
+    } catch (err) {
+      setDecideError(err.message)
+    } finally {
+      setSaving(null)
+    }
+  }
 
   const evidenceItems = []
   if (c.reports > 0) {
@@ -76,18 +99,43 @@ export default function DetailPanel({ activeCase }) {
           <div className="text-xs text-[var(--text-muted)] mb-1">Recommended action</div>
           <div className="text-[15px] font-semibold">{c.recommended_action}</div>
         </div>
-        <div className="flex gap-2.5">
-          <button className="text-[13px] font-semibold px-4 py-2.5 rounded-md border" style={{ borderColor: "var(--border-strong)" }}>
-            Override
-          </button>
-          <button
-            className="text-[13px] font-semibold px-4 py-2.5 rounded-md border"
-            style={{ background: "var(--status-good)", borderColor: "var(--status-good)", color: "#06230a" }}
+
+        {status === "pending" ? (
+          <div className="flex gap-2.5">
+            <button
+              onClick={() => handleClick("override")}
+              disabled={saving !== null}
+              className="text-[13px] font-semibold px-4 py-2.5 rounded-md border disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ borderColor: "var(--border-strong)" }}
+            >
+              {saving === "override" ? "Saving..." : "Override"}
+            </button>
+            <button
+              onClick={() => handleClick("approve")}
+              disabled={saving !== null}
+              className="text-[13px] font-semibold px-4 py-2.5 rounded-md border disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: "var(--status-good)", borderColor: "var(--status-good)", color: "#06230a" }}
+            >
+              {saving === "approve" ? "Saving..." : "Approve"}
+            </button>
+          </div>
+        ) : (
+          <span
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-md border capitalize"
+            style={
+              status === "approved"
+                ? { color: "var(--status-good)", background: "rgba(12,163,12,0.12)", borderColor: "var(--status-good)" }
+                : { color: "var(--text-secondary)", background: "var(--card)", borderColor: "var(--border-strong)" }
+            }
           >
-            Approve
-          </button>
-        </div>
+            {status === "approved" ? "Approved — enforced" : "Overridden — dismissed"}
+          </span>
+        )}
       </div>
+
+      {decideError && (
+        <p className="text-[var(--status-critical)] text-xs mt-3 text-right">{decideError}</p>
+      )}
     </div>
   )
 }
