@@ -24,6 +24,7 @@ from offense_store import (
     record_offense,
     record_case_decision,
     get_case_decision,
+    revert_case_decision,
 )
 
 
@@ -85,10 +86,26 @@ def decide_case(player_id: str, body: DecisionRequest):
     if case is None:
         raise HTTPException(status_code=404, detail="No matching flagged case for that player/category")
 
+    offense_id = None
     if body.decision == "approve":
-        record_offense(player_id, body.category, case["severity"], case["recommended_action"])
+        offense_id = record_offense(player_id, body.category, case["severity"], case["recommended_action"])
 
     status = "approved" if body.decision == "approve" else "overridden"
-    record_case_decision(player_id, body.category, status)
+    record_case_decision(player_id, body.category, status, offense_id=offense_id)
 
     return {"player_id": player_id, "category": body.category, "status": status}
+
+
+class RevertRequest(BaseModel):
+    category: str
+
+
+@app.post("/cases/{player_id}/revert")
+def revert_case(player_id: str, body: RevertRequest):
+    """Undoes the most recent moderator decision on a case, restoring it to pending.
+    If the decision being undone was an approval, the offense record it created is
+    removed too, so repeat-offender escalation isn't left inflated."""
+    reverted = revert_case_decision(player_id, body.category)
+    if not reverted:
+        raise HTTPException(status_code=404, detail="No decision to revert for that player/category")
+    return {"player_id": player_id, "category": body.category, "status": "pending"}

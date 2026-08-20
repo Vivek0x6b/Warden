@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react"
 import { sevColor, sevTrack, sevIcon, catColor, catIcon, catLabel } from "../lib/severity"
 
-export default function DetailPanel({ activeCase, onDecide }) {
+export default function DetailPanel({ activeCase, onDecide, onRevert }) {
   const [saving, setSaving] = useState(null) // "approve" | "override" | null
+  const [reverting, setReverting] = useState(false)
   const [decideError, setDecideError] = useState(null)
 
   // Reset transient UI state whenever the selected case changes.
   useEffect(() => {
     setSaving(null)
+    setReverting(false)
     setDecideError(null)
   }, [activeCase?.player_id, activeCase?.category])
 
@@ -26,6 +28,18 @@ export default function DetailPanel({ activeCase, onDecide }) {
       setDecideError(err.message)
     } finally {
       setSaving(null)
+    }
+  }
+
+  const handleRevertClick = async () => {
+    setReverting(true)
+    setDecideError(null)
+    try {
+      await onRevert(c.player_id, c.category)
+    } catch (err) {
+      setDecideError(err.message)
+    } finally {
+      setReverting(false)
     }
   }
 
@@ -120,16 +134,25 @@ export default function DetailPanel({ activeCase, onDecide }) {
             </button>
           </div>
         ) : (
-          <span
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-md border capitalize"
-            style={
-              status === "approved"
-                ? { color: "var(--status-good)", background: "rgba(12,163,12,0.12)", borderColor: "var(--status-good)" }
-                : { color: "var(--text-secondary)", background: "var(--card)", borderColor: "var(--border-strong)" }
-            }
-          >
-            {status === "approved" ? "Approved — enforced" : "Overridden — dismissed"}
-          </span>
+          <div className="flex items-center gap-2.5">
+            <span
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-md border capitalize"
+              style={
+                status === "approved"
+                  ? { color: "var(--status-good)", background: "rgba(12,163,12,0.12)", borderColor: "var(--status-good)" }
+                  : { color: "var(--text-secondary)", background: "var(--card)", borderColor: "var(--border-strong)" }
+              }
+            >
+              {status === "approved" ? "Approved — enforced" : "Overridden — dismissed"}
+            </span>
+            <button
+              onClick={handleRevertClick}
+              disabled={reverting}
+              className="text-[12.5px] font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {reverting ? "Reverting..." : "Revert"}
+            </button>
+          </div>
         )}
       </div>
 

@@ -18,3 +18,18 @@ export async function postDecision(playerId, category, decision) {
 
   return res.json()
 }
+
+export async function postRevert(playerId, category) {
+  const res = await fetch(`${API_BASE}/cases/${encodeURIComponent(playerId)}/revert`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ category }),
+  })
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.detail || `Request failed with ${res.status}`)
+  }
+
+  return res.json()
+}

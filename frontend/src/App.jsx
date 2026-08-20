@@ -7,7 +7,8 @@ import CaseQueue from "./components/CaseQueue"
 import DetailPanel from "./components/DetailPanel"
 import Header from "./components/Header"
 import StatTiles from "./components/StatTiles"
-import { API_URL, postDecision } from "./lib/api"
+import { API_URL, postDecision, postRevert } from "./lib/api"
+import { sevOrder } from "./lib/severity"
 
 function App() {
   const [cases, setCases] = useState([])
@@ -37,6 +38,26 @@ function App() {
 
   const handleDecision = async (playerId, category, decision) => {
     const result = await postDecision(playerId, category, decision)
+    let updatedCases
+    setCases((prev) => {
+      updatedCases = prev.map((c) =>
+        c.player_id === playerId && c.category === category ? { ...c, status: result.status } : c
+      )
+      return updatedCases
+    })
+    // If the case we just decided was the one open in the detail panel,
+    // jump to the next pending case instead of leaving a resolved one selected.
+    setSelectedId((prevSelected) => {
+      if (prevSelected !== playerId) return prevSelected
+      const nextPending = [...updatedCases]
+        .filter((c) => (c.status || "pending") === "pending")
+        .sort((a, b) => sevOrder[a.severity] - sevOrder[b.severity])[0]
+      return nextPending ? nextPending.player_id : prevSelected
+    })
+  }
+
+  const handleRevert = async (playerId, category) => {
+    const result = await postRevert(playerId, category)
     setCases((prev) =>
       prev.map((c) =>
         c.player_id === playerId && c.category === category ? { ...c, status: result.status } : c
@@ -82,7 +103,7 @@ function App() {
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.15 }}
               >
-                <DetailPanel activeCase={selectedCase} onDecide={handleDecision} />
+                <DetailPanel activeCase={selectedCase} onDecide={handleDecision} onRevert={handleRevert} />
               </motion.div>
             </AnimatePresence>
             <EvidencePanel activeCase={selectedCase} />
